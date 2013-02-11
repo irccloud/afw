@@ -335,7 +335,16 @@ module AFW
         if s_results.nil?
           results = []
         else
-          results = s_results.map{|n| n['network']['lanip'] || n['ipaddress'] || BLACKHOLE_IP}
+          ## node.network does not necessarily exist in some environments:
+          ## chef nodes with *LOTS* of IPs often blacklist node.network
+          ## since it creates too many fields for solr to index.
+          results = s_results.map do |n|
+              if n['network'] and n['network']['lanip']
+                  n['network']['lanip']
+              else
+                  n['ipaddress'] || BLACKHOLE_IP
+              end
+          end
         end
       end
 
