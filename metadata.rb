@@ -1,4 +1,4 @@
-name             "AFW"
+name             "afw"
 maintainer       "Julien Vehent"
 maintainer_email "julien@linuxwall.info"
 license          "All rights reserved"
