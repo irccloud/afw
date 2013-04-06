@@ -31,7 +31,7 @@ module AFW
     if rule_is_predefined?(node, name, params)
       if not node['afw']['tables'][params['table']]['rules'].include?(
              params['rule'])
-        node['afw']['tables'][params['table']]['rules'].push(params['rule'])
+        node.set['afw']['tables'][params['table']]['rules'].push(params['rule'])
       end
       return true
     end
@@ -281,7 +281,7 @@ module AFW
     iptables_rules.each do |iptables_rule|
       unless node['afw']['chains'][user]['rules'].include?(iptables_rule)
         Chef::Log.info("AFW: storing rule '#{iptables_rule}'")
-        node['afw']['chains'][user]['rules'].push(iptables_rule)
+        node.set['afw']['chains'][user]['rules'].push(iptables_rule)
       end
     end
   end
