@@ -31,7 +31,7 @@ module AFW
     if rule_is_predefined?(node, name, params)
       if not node['afw']['tables'][params['table']]['rules'].include?(
              params['rule'])
-        node.set['afw']['tables'][params['table']]['rules'].push(params['rule'])
+        node.default['afw']['tables'][params['table']]['rules'].push(params['rule'])
       end
       return true
     end
