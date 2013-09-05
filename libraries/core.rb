@@ -342,7 +342,7 @@ module AFW
               if n['network'] and n['network']['lanip']
                   n['network']['lanip']
               else
-                  n['ipaddress'] || BLACKHOLE_IP
+                  n['ec2_public_ipv4'] || (n['ipaddress'] || BLACKHOLE_IP)
               end
           end
         end
