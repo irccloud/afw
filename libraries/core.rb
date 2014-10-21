@@ -352,12 +352,20 @@ module AFW
           ## node.network does not necessarily exist in some environments:
           ## chef nodes with *LOTS* of IPs often blacklist node.network
           ## since it creates too many fields for solr to index.
-          results = s_results.map do |n|
-              if n['network'] and n['network']['lanip']
-                  n['network']['lanip']
+          s_results.each do |n|
+            if n['network'] and n['network']['lanip']
+              results.push n['network']['lanip']
+            else
+              if n['ec2_public_ipv4']
+                ## this node is on ec2, add both IPs to firewall rules
+                # pretty sure if it has ec2_public_ip, it HAS to have a mgmt one too
+                # but we guard and use blackhole just in case
+                results.push n['ec2_public_ipv4']
+                results.push (n['management_listen_ipv4'] || BLACKHOLE_IP)
               else
-                  n['ec2_public_ipv4'] || (n['ipaddress'] || BLACKHOLE_IP)
+                results.push (n['ipaddress'] || BLACKHOLE_IP)
               end
+            end
           end
         end
       end
