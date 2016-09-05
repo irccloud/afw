@@ -73,7 +73,7 @@ end
 
 case node['platform']
   when 'ubuntu'
-    if node['platform_version'].to_f >= 16.4
+    if node['platform_version'].to_f >= 16.04
       cookbook_file '/etc/systemd/system/firewall.service' do
         owner 'root'
         group 'root'
@@ -100,7 +100,7 @@ end
 service 'firewall' do
   case node['platform']
     when 'ubuntu'
-      if node['platform_version'].to_f >= 16.4
+      if node['platform_version'].to_f >= 16.04
         provider Chef::Provider::Service::Systemd
       elsif node['platform_version'].to_f >= 9.10
         provider Chef::Provider::Service::Upstart
