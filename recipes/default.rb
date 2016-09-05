@@ -66,13 +66,27 @@ cookbook_file '/etc/firewall/empty.iptables' do
   source 'empty.iptables'
 end
 
+execute "reload systemd daemons" do
+  command "/bin/systemctl daemon-reload"
+  action :nothing
+end
+
 case node['platform']
   when 'ubuntu'
-    cookbook_file '/etc/init/firewall.conf' do
-      owner 'root'
-      group 'root'
-      mode 0600
-      source 'upstart-firewall.conf'
+    if node['platform_version'].to_f >= 16.4
+      cookbook_file '/etc/systemd/system/firewall.service' do
+        owner 'root'
+        group 'root'
+        mode 0600
+        notifies :run, "execute[reload systemd daemons]"
+      end
+    else
+      cookbook_file '/etc/init/firewall.conf' do
+        owner 'root'
+        group 'root'
+        mode 0600
+        source 'upstart-firewall.conf'
+      end
     end
   else
     cookbook_file '/etc/init.d/firewall' do
