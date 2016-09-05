@@ -78,7 +78,7 @@ case node['platform']
         owner 'root'
         group 'root'
         mode 0600
-        notifies :run, "execute[reload systemd daemons]"
+        notifies :run, "execute[reload systemd daemons]", :immediately
       end
     else
       cookbook_file '/etc/init/firewall.conf' do
