@@ -77,7 +77,7 @@ case node['platform']
       cookbook_file '/etc/systemd/system/firewall.service' do
         owner 'root'
         group 'root'
-        mode 0600
+        mode 0644
         notifies :run, "execute[reload systemd daemons]", :immediately
       end
     else
