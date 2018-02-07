@@ -27,9 +27,9 @@ default['afw']['ruby_source'] = "gempackage"
 
 default['afw']['enable_rules_cleanup'] = true
 
-case platform
-when "centos","redhat","fedora"
-  set['afw']['dnsruby_package_name'] = "rubygem-dnsruby"
-when "debian","ubuntu"
-  set['afw']['dnsruby_package_name'] = "ruby-dnsruby"
+case node['platform']
+  when "centos","redhat","fedora"
+    set['afw']['dnsruby_package_name'] = "rubygem-dnsruby"
+  when "debian","ubuntu"
+    set['afw']['dnsruby_package_name'] = "ruby-dnsruby"
 end
