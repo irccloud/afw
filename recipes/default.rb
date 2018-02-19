@@ -113,9 +113,9 @@ end
 
 ruby_block 'cleanup_rules' do
   block do
-    node.set['afw']['rules'] = {}
-    node.set['afw']['chains'] = {}
-    node.set['afw']['tables'] = {}
+    node.normal['afw']['rules'] = {}
+    node.normal['afw']['chains'] = {}
+    node.normal['afw']['tables'] = {}
   end
   only_if { node['afw']['enable_rules_cleanup'] == true }
 end
@@ -127,15 +127,13 @@ execute 'restore firewall' do
       action :run
     else
       action :nothing
-      subscribes :run,
-                 resources(:template => '/etc/firewall/rules.iptables'),
-                 :delayed
+      subscribes :run, 'template[/etc/firewall/rules.iptables]', :delayed
     end
   else
     action :nothing
     Chef::Log.error "AFW: is disabled. enable='#{node['afw']['enable']}'"
   end
-  notifies :create, 'ruby_block[cleanup_rules]'
+  notifies :run, 'ruby_block[cleanup_rules]'
 end
 
 

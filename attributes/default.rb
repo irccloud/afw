@@ -29,7 +29,7 @@ default['afw']['enable_rules_cleanup'] = true
 
 case node['platform']
   when "centos","redhat","fedora"
-    set['afw']['dnsruby_package_name'] = "rubygem-dnsruby"
+    default['afw']['dnsruby_package_name'] = "rubygem-dnsruby"
   when "debian","ubuntu"
-    set['afw']['dnsruby_package_name'] = "ruby-dnsruby"
+    default['afw']['dnsruby_package_name'] = "ruby-dnsruby"
 end
