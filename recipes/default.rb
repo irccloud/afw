@@ -38,11 +38,11 @@ end
 
 node.default['afw']['rules'] ||= {}
 node['afw']['rules'].each do |name,params|
-  Chef::Log.info("AFW: processing rule '#{name}'")
+  Chef::Log.debug("AFW: processing rule '#{name}'")
   if process_rule(node, name, params)
-    Chef::Log.info("AFW: finished processing of rule '#{name}'")
+    Chef::Log.debug("AFW: finished processing of rule '#{name}'")
   else
-    Chef::Log.info("AFW: rule '#{name}' failed. Skipping it.")
+    Chef::Log.debug("AFW: rule '#{name}' failed. Skipping it.")
   end
 end
 

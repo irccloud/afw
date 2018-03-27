@@ -23,7 +23,7 @@ module AFW
     # If the rule is not applicable to this environment, skip it
     env = params.fetch('env', node.chef_environment)
     if env != node.chef_environment
-      Chef::Log.info("AFW: rule '#{name}' is for '#{env}' environment. Skipping it")
+      Chef::Log.debug("AFW: rule '#{name}' is for '#{env}' environment. Skipping it")
       return true
     end
 
@@ -39,7 +39,7 @@ module AFW
     # skip the grammar check if specifically asked
     options = params.fetch('options', node.chef_environment)
     if options.include?('disable_syntax_check')
-      Chef::Log.info("AFW: disabling syntax checking for rule '#{name}'")
+      Chef::Log.debug("AFW: disabling syntax checking for rule '#{name}'")
     else
       # grammar check, skip rule if doesn't pass
       if not rule_validation(node, name,params)
@@ -73,7 +73,7 @@ module AFW
       uid = check_user(node, user, name)
       if uid == -1
         # if no valid user was found, skip this rule
-        Chef::Log.info("AFW: no valid user was found for rule '#{name}'. skipping it.")
+        Chef::Log.warn("AFW: no valid user was found for rule '#{name}'. skipping it.")
         return true
       end
       unless node['afw']['chains'].has_key?(user)
@@ -94,10 +94,10 @@ module AFW
     if params.has_key?("rule") and params.has_key?("table")
       if ['nat','raw','mangle','filter'].include?(params['table'])
         unless node['afw']['tables'][params['table']]['rules'].include?(params['rule'])
-          Chef::Log.info("AFW: storing predefined rule '#{name}'")
+          Chef::Log.debug("AFW: storing predefined rule '#{name}'")
         end
       else
-        Chef::Log.info("AFW: wrong table name '#{params['table']}' in rule '#{name}'")
+        Chef::Log.warn("AFW: wrong table name '#{params['table']}' in rule '#{name}'")
       end
       return true
     end
@@ -138,7 +138,7 @@ module AFW
         then true
         else
           # If the interface doesn't exist, log and skip the current rule
-          Chef::Log.info("AFW: Unknown interface '#{rule_params['interface']}'" +
+          Chef::Log.warn("AFW: Unknown interface '#{rule_params['interface']}'" +
                          " in rule '#{name}'.")
           return false
         end
@@ -222,7 +222,7 @@ module AFW
       end
       tags_list << ")"
       search_string["SAMETAG"] = tags_list
-      Chef::Log.info("AFW: adding tags '#{tags_list}' to search string in rule '#{name}'")
+      Chef::Log.debug("AFW: adding tags '#{tags_list}' to search string in rule '#{name}'")
     end
     return search_string
   end
@@ -237,7 +237,7 @@ module AFW
     begin
       uid = Etc.getpwnam(user)['uid']
     rescue ArgumentError
-      Chef::Log.info("AFW: Discarding rule '#{name}'. no user '#{user}' could be found.")
+      Chef::Log.warn("AFW: Discarding rule '#{name}'. no user '#{user}' could be found.")
       node.default['afw']['missing_user'] = true
     end
     return uid
@@ -281,7 +281,7 @@ module AFW
     iptables_rules.each do |iptables_rule|
       existing = node['afw']['chains'][user]['rules']
       unless existing.include?(iptables_rule)
-        Chef::Log.info("AFW: storing rule '#{iptables_rule}'")
+        Chef::Log.debug("AFW: storing rule '#{iptables_rule}'")
         node.normal['afw']['chains'][user]['rules'] = existing.to_a + [iptables_rule]
       end
     end
@@ -389,7 +389,7 @@ module AFW
     # if used, the search that will be used to list sources and destinations
     # will not be limited to the current environment
     if options.include?('disable_env_limit')
-      Chef::Log.info("HERESY ! [disable_env_limit] used in rule '#{name}'")
+      Chef::Log.debug("HERESY ! [disable_env_limit] used in rule '#{name}'")
     else
       search_string << " AND chef_environment:#{node.chef_environment}"
     end
@@ -404,7 +404,7 @@ module AFW
     iptables_array_destination = []
 
     if sources.count < 1 and destinations.count < 1
-      Chef::Log.info("AFW: no source or destination found")
+      Chef::Log.warn("AFW: no source or destination found")
       # don't create a rule that has no source and destination
       return []
     end
@@ -440,7 +440,7 @@ module AFW
           "#{iptables_source} -m conntrack --ctstate NEW -j ACCEPT" +
           comment_opts
         )
-        Chef::Log.info("AFW: building rule '#{iptables_source} " +
+        Chef::Log.debug("AFW: building rule '#{iptables_source} " +
             "-m conntrack --ctstate NEW -j ACCEPT'")
       end
     end
@@ -458,11 +458,11 @@ module AFW
     node.default['afw']['rules'][name] = params
     # Wrapper around `process_rule`
     #
-    Chef::Log.info("AFW.create_rule(): processing '#{name}'")
+    Chef::Log.debug("AFW.create_rule(): processing '#{name}'")
     if AFW.process_rule(node, name, params)
-      Chef::Log.info("AFW.create_rule(): finished processing '#{name}'")
+      Chef::Log.debug("AFW.create_rule(): finished processing '#{name}'")
     else
-      Chef::Log.info("AFW.create_rule(): rule '#{name}' failed. Skipping it.")
+      Chef::Log.debug("AFW.create_rule(): rule '#{name}' failed. Skipping it.")
     end
     return true
   end
